@@ -1,5 +1,5 @@
 #! requires store.rpy
-init -101 python:
+init -99 python:
 
   class StateMachineDisplayable(renpy.Displayable, StoreBackedObject):
     #: (self, str, a, { a: Displayable }) -> unit
@@ -81,12 +81,12 @@ init -101 python:
 
 
   class ComposedSpriteAccessor(object):
-    #: () -> a | None
-    def state():
+    #: (self) -> a | None
+    def state(self):
       pass
 
-    #: (a, Transition?) -> unit
-    def update(new_state, transition=None):
+    #: (self, a, Transition?) -> unit
+    def update(self, new_state, transition=None):
       pass
 
 
@@ -95,12 +95,12 @@ init -101 python:
     def __init__(self, displayable):
       self.displayable = displayable
 
-    #: () -> a | None
-    def state():
+    #: (self) -> a | None
+    def state(self):
       return self.displayable.current_state
 
-    #: (a, Transition?) -> unit
-    def update(new_state, transition=None):
+    #: (self, a, Transition?) -> unit
+    def update(self, new_state, transition=None):
       self.displayable.set_state(new_state, transition)
 
 
@@ -111,18 +111,18 @@ init -101 python:
       self.index = index
       self.length = length
 
-    #: () -> a | None
-    def state():
+    #: (self) -> a | None
+    def state(self):
       if self.displayable.current_state is not None:
         return self.displayable.current_state[self.index]
     
-    #: (a, Transition?) -> unit
-    def update(new_state, transition=None):
+    #: (self, a, Transition?) -> unit
+    def update(self, new_state, transition=None):
       state = self.displayable.current_state
       if state is None:
         state = [None for x in xrange(0, self.length)]
       else:
-        state = list(old)
+        state = list(state)
 
       state[self.index] = new_state
       self.displayable.set_state(tuple(state), transition)
@@ -139,7 +139,7 @@ init -101 python:
       for (name, _, displayable) in layers:
         if isinstance(name, tuple):
           for (index, layer_name) in enumerate(name):
-            self.layer_map[layer_name] = ComposedSpriteTupleAccessor(displayable, len(tuple), index)
+            self.layer_map[layer_name] = ComposedSpriteTupleAccessor(displayable, len(name), index)
         elif name is not None:
           self.layer_map[name] = ComposedSpriteIdentityAccessor(displayable)
 
